@@ -1,0 +1,32 @@
+sample(10000,35)
+help("sample")
+### PEQUEÑA BASE DE DATOS CON 4 VARIABLES ###
+### NOMBRE, EDAD, SEXO Y TIPO DE EDUCACION ###
+
+# Declara variables para base de datos #
+nombres<-c("Sergio","Alan","Betzabeth","Judith","Rodrigo","Eric","Diego","Angel")
+edad<-c(36,20,23,20,21,21,22,21)
+sexo<-c("Hombre","Hombre","Mujer","Mujer","Hombre","Hombre","Hombre","Hombre")
+educ<-c("Publica","Publica","Publica","Publica","Privada","Publica","Publica","Publica")
+
+# Para hacer la matriz #
+base1<- matrix(c(nombres,edad,sexo,educ),nrow = 8, ncol = 4)
+View(base1)
+dimnames(base1)<-list(,"Nombre", "Edad","Sexo","Tipo de Educacion")
+help("rownames")
+
+# Para hacer un data frame #
+base2<- data.frame(nombres,edad,sexo,educ)
+View(base2)
+
+# Para checar el numero de frecuencia de una variable (que tanto se repite)
+# Utilizamos el $ para marcar la ruta o la tabla de donde lo queremos
+table(base2$edad)
+table(edad)  # este solo se utiliza con ayuda del attach detach
+
+# Para cuando  tenemos muchas bases y solo queremos utilizar una base a aprtir de cierto momento
+# utilizamos attach(nombre de la base)
+attach(base2)
+
+# Para hacer un resumen de las variables 
+summary(base2)
