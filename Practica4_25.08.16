@@ -1,0 +1,29 @@
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#
+############                       PRACTICA 4                         ############
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#
+install.packages("XLConnect") #esta libreria nos pasa las tablas a excell
+require(XLConnect)
+wb<-loadworkbook("Ruta/mi_nombre.xls",create=TRUE) #te genera un libro de excel
+createSheet(wb,name="SEXO") #me genera en el libro wb la hoja llamada sexo
+writeWorksheet(wb,tabla1,"SEXO",startRow=1,startCol=2,header=TRUE) #me crea la tabla en wb y posteriormente se encuentra en el nombre de la tabla que quiero hacer
+createSheet(wb,name="COND.DE OCUP")
+writeWorksheet(wb,tabla2,"COND.DE OCUP",startRow=1,startCol=2,header=TRUE)
+createSheet(wb,name="POBLACION ACTIVA")
+
+require(foreign)
+setwd("C://Users//SALA-C16//Documents//Docs_R")
+SDEMT215<-data.frame(read.dbf("SDEMT215.dbf"))
+SONORA<-subset(SDEMT215,SDEMT215$ENT == 26)
+table(SONORA)
+#SONORA1<-subset(SONORA,SONORA$SEX == "1" | SONORA$SEX == "2" | SONORA$POS_OCU)
+var<-c("ENT","SEX","POS_OCU")
+TABLA1<-SONORA[,var]
+table(TABLA1)
+View(TABLA1)
+
+mujer<-subset(SDEMT215,SDEMT215$SEX == 2)
+table(mujer$SEX) #subset(la_basededondelovoyasacar,la_base$loquequiero)
+# siempre checar si es caracter o no? y  si no cambiarlo para utilizarlo como mujer
+mujer$CD_A<-as.character(mujer$CD_A)
+mujer1<-subset(mujer,mujer$CD_A == "02" | mujer$CD_A == "16")
+table(mujer1$CD_A)
