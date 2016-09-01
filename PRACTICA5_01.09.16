@@ -1,0 +1,49 @@
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#
+############                       PRACTICA 5                         ############
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#
+
+### Queremos comprobar la hipotesis que entre mayor ingreso de la familia
+### hay una mayor estatura en los niños
+estaturas<-c(1.2,1.23,1.19,1.32,1.28,1.22,1.17,1.29,1.33,1.15)
+nivsocioe<-c(110,130,108,167,156,115,104,138,170,107)
+
+### PASO 1: Para empezar a hacer el analisis de regresion lo primero que se debe de hacer es
+###el grafico de dispersion
+plot(estaturas,nivsocioe,pch=11,xlab = "Estatura",ylab = "Ingreso economico",main = "GRAFICA DE DISPERSION")
+#plot(var,indep,var dep.pch=que puntos quiero,nombrex,nombrey,titulo)
+help(cor)
+
+### PASO 2: para calcular el coeficiente de correlacion:
+cor(estaturas,nivsocioe,method = "pearson")
+### var.dep=x, var,indep=y, por default la version te da pearson
+### el resultado me dio 0.9556 eso quiere decir que hay una muy alta relacion
+### positiva, lo cual dice que podemos seguir con el modelo, por que si hay una
+### relacion entre variables.
+
+### PASO 3: hay que confirmar que hay una buena relacion,donde hacemos una prueba con 
+### cierto nivel de confianza y establñecemos hipotesis
+### H0: r=0 (no hay relacion)      vs     Ha: r=!0 (si hay relacion)
+cor.test(estaturas,nivsocioe,method = "pearson")
+### al aplicarlo me da un p-value<0.05, lo cual me rechaza mi H0, por lo tanto
+### hay bastante relacion entre las variables con un 95% de confianza.
+
+### PASO 4: Al aplicar todo lo anterior todo confirma que hay una relacion, por 
+### lo tanto proseguimos con el modelo, buscare la mejor recta que ajuste a los 
+### puntos 
+mod1<- lm(estaturas~nivsocioe) #   lineal model(y~x)
+summary(mod1)
+### hace un analisis de los residuales el min max el de media 1er cuartil y 3er 
+### cuartil, que son muy cercanos a 0, me generan las diferencias entre los 
+### valores ajustados y los reales. En los resultados tenemos los coef. que 
+### contienen que expone si los coef. son significativos
+
+### PASO 5: Ahora volveremos a graficar la dispersion:
+plot(nivsocioe,estaturas,pch=11,xlab = "Estatura",ylab = "Ingreso economico",main = "GRAFICA DE DISPERSION")
+### y utilizamos la recta ajustada con abline
+abline(mod1,col="purple")
+
+### PASO 7: Ahora plantearemos la ecuacion de esta recta ajustada
+### estaturas = 0.9323 + 0.0023nivsocioe
+
+### pASO 8:hay que probar los supuestos
+### y posteriormente analizar los coeficientes.
