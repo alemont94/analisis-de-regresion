@@ -1,0 +1,24 @@
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#
+############                       PRACTICA 6                         ############
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#
+
+### CONCLUSIONES
+### 1. Cuando tengo un p.value menor a 0.05: hay relacion entre var dep e indep, una relacion positiva
+### 2. Por cada peso de ingreso aumenta la estatura en un 0.0023
+### 3. El error estandar residual (0.0198): permite medir la calidad del modelo y ponemos un intervalo de confianza
+confint(mod1,level = .95)
+### Con esto sabemos el intervalo de B0 
+###                             y de B1
+
+### BONDAD DE AJUSTE ###
+### Si no pasa la bondad de ajuste quiere decir que no hay relacion aunque parezca que si la hay
+### Con esta se verifica la calidad del modelo, al interpretar la var. dep, utilizamos la tabla ANOVA
+anovamod1<-anova(mod1)
+### En este caso la variabilidad explicada del modelo es SSM = .033022
+### Se revisa la SSR = .0031
+summary(anovamod1)
+### Revisando el summary observo que F es mayor a 1 y p-value<0.5
+### Por lo tanto se rechaza la hipotesis nula de F= 1, y se puede establecer un modelo
+
+### REVISAR R^2 MULTIPLE (MULTIPLE R-SQUARED) ###
+### Quiere decir que acerca del 91% es explicada por la recta ajustada
