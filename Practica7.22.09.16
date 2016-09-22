@@ -1,0 +1,46 @@
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#
+############                       PRACTICA 7                         ############
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#
+install.packages("car")
+base1<-data.frame(nivsocioe,estaturas)
+
+base1$ajuste.mod1<-fitted(mod1) ### pone en la base los valores ajustados (y^)
+base1$residuales.mod1<-residuals(mod1) ###pone los residuos del modelo   (y-y^)
+base1$rstudent.mod1<-rstudent(mod1) ###pone los residuos estandarizados o estudentizados
+
+View(base1)
+
+#Ahora realizamos la prueba de hipotesis de shapiro ´para conocer si hay normalidad
+#en los residuos, Ho: la muestar tiene unas distr. normal vs Ha: no es normal 
+shapiro.test(base1$rstudent.mod1)
+qqnorm(base1$rstudent.mod1, main = "Normal (0,1)") #grafico para verificar 
+qqline(base1$rstudent.mod1)
+
+#Ahora realizamos la prueba de homogeneidad de varianzas
+#donde H0: homogeinidad en las varianzas vs Ha: no hay homogeneidad
+install.packages("lmtest")
+require(lmtest)
+bptest(mod1)
+
+#Se realiza la prueba de autocorrelacion o independencia 
+#donde H0:hay independencia de residuos vs Ha:no hay indep
+require(car)
+dwtest(mod1,alternative = "two.sided")
+plot(base1$residuales.mod1,pch=10, ylab = "RESIDUALES",xlab = "IN") #grafica para verificar que esta bien, buscamos una sin relacion alguna
+abline(h=cor(base1$estaturas,base1$nivsocioe))
+
+#CONCLUSION: TENEMOS UN BUEN MODELO
+
+#### AHORA ####
+
+#Podemos predecir:
+#Para no tener problemas con los rangos, vamos a definir una nueva base con los limites
+#de nuestra variable independiente (ingresos economicos)
+#creamos un data.frame con valores aleatorios que esten entre nuestro valor minimo
+#de la base original y el maximo
+limbase1<-seq(min(base1$nivsocioe),max(base1$nivsocioe),length=10)
+limbase1<-data.frame(limbase1)
+#para predecir se usa predict.lm
+limbasep<-predict.lm(mod1,limbase1,interval = "prediction",se.fit = TRUE, data=base1)
+head(limbasep$fit) #te genera los limites
+matplot(limbase1,limbasep$fit,type="l",xlab = "INGRESO",ylab = "ESTATURA")
