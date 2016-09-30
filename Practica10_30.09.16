@@ -1,0 +1,58 @@
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#
+############                      PRACTICA 10                         ############
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#
+
+# Despues de analizar graficamente se hacen pruebas estadiaticas para confirmar
+# todo lo anterior y no solo quede subjetivo
+
+capacidad<-c(4330,5500,5500,4700,5200,5500,4700,5500,5800,5000) #Intependiente(x2)
+calidad<-c(2,3,4,3,4,4,4,5,5,5)
+precio<-c(190,219,249,249,250,340,289,395,439,525)
+mochil<-data.frame(precio,calidad,capacidad)
+modmo<-lm(precio~calidad+capacidad,mochil)
+
+mochil$ajustados<-fitted(modmo) #fitted me deja tener los valores ajustados
+mochil$residuales<-residuals(modmo) #residuales cercanos a 1
+mochil$estand<-rstudent(modmo) #los valores estandarizados
+
+#1. PRUEBA DE NORMALIDAD:
+require(lmtest)
+ks.test(mochil$estand,"pnorm")
+# El p-value acepta la Ho por lo tanto el modelo pasa la prueba de normalidad
+
+#2. HOMOGENEIDAD DE VARIANZAS:
+bptest(modmo,studentize = FALSE, data = mochil)
+# P>0.05, por lo tanto hay homogeneidad de varianzas
+
+#3. AUTOCORRELACION
+dwtest(modmo,alternative="two.sided",data=mochil)
+# *Buscamos un p-value mayor a 0.05 y se acepta Ho
+# *Valor de DW (1.5,2.5)
+# Por lo tanto no hay correlacion entre los residuos
+
+### FINALMENTE, con estas pruebas ya se confirma que tenemos un modelo con un buen ajuste.
+
+#4. REVISAR DATOS ATIPICOS: (datos que saltan de lo normal, para quizas quitarlos)
+install.packages("car")
+require(car)
+outlier.test(modmo)
+#Esta nos enseña los casos atipicos
+#Ahora conoceremos la influencia de ellos en el modelo
+influ<-influence.measures(modmo)
+summary(influ)
+# "dfb":Influencia de los coeficientes en el modelo
+# "cook.d": distancia de cook, entre mas cercano a 1, hay mayor influencia
+# "hat": se asocia con las medidas de leverage (0,1), cercano a 1 hay mayor influencia
+
+#ademas de estas pruebas podemos volver a hacer grafico para observar con mayor claridad las influencias
+require(car)
+influencePlot(modmo)
+install.packages("faraway")
+require(faraway)
+DC<-cooks.distance(modmo)
+etiqueta<-rownames(mochil)
+halfnorm(DC,3,etiqueta)
+   
+### CONCLUSION: TENEMOS UN BUEN MODELO, EXCEPTO EL DATO 10 ES EL QUE MAS AFECTA AL MODELO.
+### Y LO ELIMINARIAMOS COMPLETAMENTE, BAJEMOS EL PRECIO DE LA MOCHILA
+### UN MODELO DE REGRESION MULTIPLE EN LA VIDA REAL, NO PASA NORMALMENTE LA PRUEBA
