@@ -1,0 +1,50 @@
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#
+############                       PRACTICA 9                         ############
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#
+# MODELO DE REGRESION MULTIPLE
+
+capacidad<-c(4330,5500,5500,4700,5200,5500,4700,5500,5800,5000) #Intependiente(x2)
+calidad<-c(2,3,4,3,4,4,4,5,5,5)
+precio<-c(190,219,249,249,250,340,289,395,439,525)
+mochil<-data.frame(precio,calidad,capacidad)
+
+#Primero aplicamos una correlacion
+cor(mochil,use = "everything",method = "pearson")
+
+#Ahora aplicamos la correlacion
+modmo<-lm(precio~calidad+capacidad)
+summary(modmo)
+#Tenemos una r2 ajustada de 0.70 lo cual explica que la recta ajustada
+#Explica en 70% la variabilidad del momento
+#Debemos obtener (F<1,p-value<0.05)
+#estamos ante un buen modelo
+
+#DIAGNOSTICO: Revision del modelo
+#1. Supuesto de varianza cte:
+# Valores residuales vs valores ajustados(graficamos el modelo, which hace esta comparacion)
+# no debe haber patron por lo tanto varianza cte
+plot(modmo,which=1,pch=3)
+
+#2. Supuesto de normalidad
+plot(modmo,which=2,pch=3)
+# Queremos que las observaciones esten cerca de la normal
+
+#3. Residuos estandarizados
+plot(modmo,which=3,pch=3)
+# Grafica sin patron, los residuos se distribuyen ctes en los valores ajustados
+
+#4. Observacion del modelo
+plot(modmo,which=5,pch=3)
+# importancia de cada observacion en el modelo, nos muestra las observaciones que podrian impactar en el modelo
+
+### NOTA: Como logramos observar que las mochilas 1, 7 y 10 
+#afectan el modelo entonces la quitamos del data frame
+mochil<-mochil[c(-1,-7,-10),]
+View(mochil)
+
+# Volvemos a hacer el modelo y la correlacion para verificar que
+# sin estos se hace una mejor relacion
+cor(mochil,use = "everything",method = "pearson")
+modmo<-lm(precio~calidad+capacidad,mochil)
+plot(modmo,which=1,pch=3)
+summary(modmo)
