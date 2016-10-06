@@ -1,0 +1,56 @@
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#
+############                      PRACTICA 11                         ############
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#
+
+capacidad<-c(4330,5500,5500,4700,5200,5500,4700,5500,5800,5000) #Intependiente(x2)
+calidad<-c(2,3,4,3,4,4,4,5,5,5)
+precio<-c(190,219,249,249,250,340,289,395,439,525)
+mochil<-data.frame(precio,calidad,capacidad)
+modmo<-lm(precio~calidad+capacidad,mochil)
+
+plot(capacidad,precio,pch=12,xlab = "Capacidad",ylab = "Precio",main = "Grafica de Dispersion",col="blue")
+cor(precio,capacidad,method = "pearson")
+cor.test(precio,capacidad,method = "pearson")
+
+#rechazamos el modelo simple ahora para la otra variable
+
+plot(calidad,precio,pch=12,xlab = "Capacidad",ylab = "Precio",main = "Grafica de Dispersion",col="blue")
+cor(precio,calidad,method = "pearson")
+cor.test(precio,capacidad,method = "pearson")
+
+## COMPARACION DE MODELOS
+# Se quiere elegir el mejor subconjunto de variables indep (calidad y capacidad)
+# 1) precio~capacidad
+# 2) precio~calidad
+# 3) precio~calidad+capacidad
+# Esto con el fin de conocer las variables indep innecesarias, evitar multicolinealidad (muchas variables explicando el modelo)
+
+## COMO LO HACEMOS?
+
+# Criterio de info de Akaike (AIC)
+# Hemos venido usando la R^2 (mlg) o la Rajustada (mmg), pero entre mas variables se
+# vayan metiendo mejor es el valor de estas R's; sin embargo hay modelos que entre 
+# menos variables el ajuste es mejor, para eso utilizamos este modelo. (este penaliza el modelo, le quita variables)
+
+#      AIC = (no.casos)(log(SumaCuadradResiduales/no.casos)) + 2k     k=no.var indep
+
+# Entre mas pequeño es el AIC, mejor es el modelo
+
+# METODO STEP BY STEP (el mas recomendado)(   step()   )
+# MODALIDADES:
+# 1) FORWARD: parte del coeficiente Bo y va probando las var indep para ver cual es la que mas aporta al modelo
+# 2) BLACWARD: R empieza con todas las var indep.
+# 3) BOTH: Empieza como el 1) solo que busca la var. indep menos util
+
+# El 2) es el mejor metodo ya que tiene un efecto represor que permite probar cuando
+# una var tiene influencia solo si hay otra constante
+
+# VAMOS A CALCULAR EL MODELO CON LAS 2 VAR INDEP
+cor(mochil,use = "everything",method = "pearson")
+mod1<-lm(precio~capacidad+calidad,data = mochil)
+summary(mod1)
+step(mod1,direction = "backward")
+# esperamos una mediana cercana a 0, de los residuales
+step(mod1,direction = "forward")
+# este solo arroja el mejor modelo 
+step(mod1,direction = "both")
