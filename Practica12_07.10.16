@@ -1,0 +1,32 @@
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#
+############                      PRACTICA 12                         ############
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#
+
+capacidad<-c(4330,5500,5500,4700,5200,5500,4700,5500,5800,5000) #Intependiente(x2)
+calidad<-c(2,3,4,3,4,4,4,5,5,5)
+precio<-c(190,219,249,249,250,340,289,395,439,525)
+mochil<-data.frame(precio,calidad,capacidad)
+modmo<-lm(precio~calidad+capacidad,mochil)
+
+step(modmo,direction = "backward")
+
+#Este supuesto me sugiere el modelo precio y calidad, asi que le aplicare los 
+#supuestos para observar que tan bueno es el modelo
+modmo2<-lm(precio~calidad)
+mochil$ajustados<-fitted(modmo2) #fitted me deja tener los valores ajustados
+mochil$residuales<-residuals(modmo2) #residuales cercanos a 1
+mochil$estand<-rstudent(modmo2) #los valores estandarizados
+
+install.packages("lmtest")
+require(lmtest)
+
+# 1. SUPUESTO DE NORMALIDAD
+ks.test(mochil$estand,"pnorm")
+plot(modmo2,which=2,pch=3)
+hist(mochil$estand,xlab = "Residuales",main = "Histograma de Residuales")
+
+# 2. HOMOGENEIDAD DE VARIANZAS
+bptest(modmo2,studentize = FALSE, data = mochil)
+
+# 3. AUTOCORRELACION
+dwtest(modmo2,alternative="two.sided",data=mochil)
