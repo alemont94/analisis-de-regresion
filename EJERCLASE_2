@@ -1,0 +1,64 @@
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#
+############                 EJERCICIO EN CLASE 2                     ############
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#
+
+y<- c(25.5,31.2,25.9,38.4 ,18.4,26.7,26.4,25.9,32  ,25.2,39.7 ,35.7,26.5)
+x1<-c(1.74,6.32,6.2 ,10.52,1.19,1.22,4.10,6.32,4.08,4.15,10.15,1.72,1.70)
+x2<-c(5.30,5.42,8.41,4.63,11.60,5.85,6.62,8.72,4.42,7.60,4.83,3.12,5.3)
+x3<-c(10.8,9.4,7.2,8.5,9.4,9.9,8,9.1,8.7,9.2,9.4,7.6,8.2)
+tabla<-data.frame(y,x1,x2,x3)
+
+# a) Graficos de dispersion y pruebas de correlacion
+plot(tabla)
+cor(tabla,use = "everything",method = "pearson")
+# Con esta prueba y en base al grafico obtenido, logramos ver que la variable que tiene mas
+# relacion con la variable dependiente es x1 al igual que x2, solo que esta ultima tiene 
+# una relacion negativa.
+
+# b) Plantear la ec. estimada original con todas las variables
+mody<-lm(y~x1+x2+x3)
+mody
+# La ecuacion de este modelo es:       y = 39.17 + 1.01x1 -1.86x2 - 0.34x3
+
+# c) Analizar la ANOVA, R-cuadrada, estadistico F (mediante p.h)
+anova(mody)
+summary(mody)
+# Mediante la ANOVA logramos observar por el p-value obtenido que las variables significativas
+# para el modelo son x1 y x2; tambien se observa en el summary que nuestra R-cuadrada es 0.91
+# lo cual nos dice que las variables independientes representan muy bien a la variable indep
+# Al igual la R-ajustada tiene un valor alto que nos confirma lo mismo.
+
+# d) Comparar modelos con bacward, elegir el mejor y analizar.
+step(mody,direction = "backward")
+# Con esta prueba se sabe que el mejor modelo es el que solo contiene a x1 y x2, pues es el que
+# obtuvo un menor AIC.
+mody2<-lm(y~x1+x2)
+plot(tabla[,-4])
+cor(tabla[,-4],use = "everything",method = "pearson")
+mody2
+# La nueva ecuacion para este modelo es:     y = 36.08 + 1.03x1 - 1.869x2
+anova(mody2)
+# La ANOVA nos vuelve a confirmar que las variables de este modelo son significativas
+summary(mody2)
+# Observamos los valores de R's y vemos que estos han disminuido puesto que a menos variables estos
+# estadisticos disminuyen.
+
+# e) Realizar los 3 supuestos a este modelo
+tabla$estand<-rstudent(mody2) #los valores estandarizados
+require(lmtest)
+# 1. SUPUESTO DE NORMALIDAD
+ks.test(tabla$estand,"pnorm")
+plot(mody2,which=2,pch=3)
+hist(tabla$estand,xlab = "Residuales",main = "Histograma de Residuales")
+# Logramos ver con este estadistico y las graficas que la normalidad en los residuos existe, pero no 
+# es tan alta.
+
+# 2. HOMOGENEIDAD DE VARIANZAS
+bptest(mody2,studentize = FALSE, data = tabla[,-4])
+# Con este estadistico se ve que hay varianzas homogeneas, pues el p-value es de 0.39 que es mayor
+# a 0.05
+
+# 3. AUTOCORRELACION
+dwtest(mody2,alternative="two.sided",data=tabla)
+# Como el p-value es mayor a 0.05, se acepta nuestra Ho, lo cual nos indica que no hay relacion
+# entre los residuos.
