@@ -1,0 +1,38 @@
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#
+############                      PRACTICA 13                         ############
+#%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%#
+
+#Considerando el ejercicio de los corredores de bolsa
+
+corredor<- c( "wall st", "etrade1", "etrade2", "pre trade", "track", "water house", "brown", "br america", 
+              "merrill lynch","strong funds")
+operacion <- c(3.7, 3.4, 2.5, 4.8, 4, 3, 2.7, 1.7, 2.2, 1.4)
+uso <- c(4.5, 3, 4, 3.7, 3.5, 3, 2.5, 3.5, 2.7, 3.6)
+gama <- c(4.8, 4.2, 4, 3.4, 3.2, 4.6, 3.3, 3.1, 3, 2.5)
+estrellas <- c(4, 3.5, 3.5, 3.5, 3.5, 3.5, 3, 3, 2.5, 2)
+
+tablae<-data.frame(operacion,uso,gama,estrellas)
+cor(tablae,use = "everything",method = "pearson")
+mode<-lm(estrellas~operacion+uso+gama)
+mode
+summary(mode)
+mode2<-lm(estrellas~operacion+gama)
+mode2
+summary(mode2)
+
+step(mode,direction = "backward")
+
+# PREDICCION
+inter<-seq(min(tablae$uso),max(tablae$uso),length(tablae$uso))
+bolsapredic<-data.frame(gama=2,operacion=2,uso=inter) #se da valores a los var. para predicir
+predic1<-predict(mode2,bolsapredic,interval = "prediction",se.fit = TRUE,data=tablae)
+head(predic1$fit)
+
+# Detectar multicolinealidad
+# Es cuando hay una fuerte correlacion entre 2 o mas variables indep
+# de la libreria car se utiliza la funcion vif(), cuando es = 1, no hay correlacion
+# 1<vif<5 moderada corr y 5<vif<10 alta corr
+install.packages("car")
+library(car)
+vif(mode)
+
