@@ -1,0 +1,488 @@
+# Práctica Banco Mundial de Datos
+# Equipo 5
+# Alejandra, Isadora, Betzabeth y Stephanie
+
+
+##### Método step by step
+##### Para comparar modelos
+##### Hay tres modalidades
+
+##### EJERCICIO TAREA
+##### Deseamos estimar una recta de regresión donde las v.d. es la esperanza de 
+##### vida femenina y las v.i. son:
+
+##### La TMI (Tasa de Mortalidad Infantil)
+##### La TGF (Tasa Global de Fecundidad)
+##### Porcentaje de hombres alfabetas (alfabmas)
+##### Porcentaje de mujeres alfabetas (alfabfem)
+##### Porcentaje de población urbana (urbana)
+##### PIB percápita
+##### La relación entre nacimientos y defunciones (nac_def)
+##### La tasa de crecimiento de la población (% anual)
+
+##### DATOS BANCO MUNDIAL 2005-2015 (si tenemos NA tenemos que eliminar esos datos)
+##### México, Argentina y Brasil
+##### PARA EL JUEVES A MÁS TARDAR, SUBIR EL SCRIB A GITHUB
+##### Mínimo poner 5 variables 
+
+
+
+##### VA A PREGUNTAR ALEATORIO EL JUEVES ¡¡¡¡¡NO OLVIDAR!!!!!
+
+
+
+##### Indicador de la tasa infantil
+##### Esperzanda de vida de la mujer
+##### ...
+
+##### México 
+##### ... (7)
+##### Brasil
+##### ... (7)
+##### Argentina
+##### ... (7)
+
+
+rm(list=ls())
+setwd("C://Users//Microsoft Windows 10//Documents//Facultad//7mo//Análisis de Regresión//Prácticas en R//Tarea equipo")
+install.packages("foreing")
+require(foreign)
+base_bm<-data.frame(read.csv("C://Users//Microsoft Windows 10//Documents//Facultad//7mo//Análisis de Regresión//Prácticas en R//Tarea equipo//WDI_Data.csv"))
+
+install.packages("questionr")
+require(questionr)
+
+#View(base_bm)
+
+##### Cambiando los códigos de las ciudades a tipo caracter
+##### ->Country.Code es el código asignado por el Banco Mundial
+base_bm$Country.Code <- as.character(base_bm$Country.Code)
+
+##### Se guarda en "mexico", "argentina" y "brasil" la información que se tiene 
+##### en la base_bm, que contiene la información de Country.Code, según su código
+##### asignado por el Banco Mundial
+
+mexico<- subset(base_bm, base_bm$Country.Code == "MEX")
+argentina <- subset(base_bm, base_bm$Country.Code == "ARG")
+brasil <- subset(base_bm, base_bm$Country.Code == "BRA")
+
+##### Utilizamos la función "rbind.data.frame" que nos ayuda a combinar la info
+##### guardada en "mexico", "argentina" y "brasil", en forma de columnas y filas.
+##### De esta manera es más fácil encontrar las variables que necesitamos para 
+##### nuestro estudio.
+##### Esta información se guarda con el nombre de info_p.
+
+info_p <- rbind.data.frame(mexico, argentina, brasil)
+
+##### Indicator.Name es una columna de información dentro de la base del BM que 
+##### que nos describe las características de los datos recabados, mediante esta 
+##### podemos buscar específicamente la información que necesitamos.
+
+#info_p$Indicator.Name <- as.character(info_p$Indicator.Name)
+#View(info_p)
+
+##### Convirtiendo Indicator.Name de cada país a tipo caracter
+mexico$Indicator.Name <- as.character(mexico$Indicator.Name)
+argentina$Indicator.Name <- as.character(argentina$Indicator.Name)
+brasil$Indicator.Name <- as.character(brasil$Indicator.Name)
+
+# Seleccionando la variable dependiente por paíz
+
+##### La información que necesitamos de la esperanza de vida femenina por país 
+##### se encuentra con el título "Life expectancy at birth, female (years)"
+
+EV_m <-  subset(mexico, mexico$Indicator.Name == "Life expectancy at birth, female (years)")
+
+##### Es necesario seleccionar año por año para sólo guardar los datos que van
+##### del 2005 al 2015
+Per_EV_m <- c(EV_m$X2005, EV_m$X2006, EV_m$X2007, EV_m$X2008, EV_m$X2009, EV_m$X2010, EV_m$X2011, EV_m$X2012, EV_m$X2013, EV_m$X2014)
+
+EV_a <-  subset(argentina, argentina$Indicator.Name == "Life expectancy at birth, female (years)")
+Per_EV_a <- c(EV_a$X2005, EV_a$X2006, EV_a$X2007, EV_a$X2008, EV_a$X2009, EV_a$X2010, EV_a$X2011, EV_a$X2012, EV_a$X2013, EV_a$X2014)
+
+EV_b <-  subset(brasil, brasil$Indicator.Name == "Life expectancy at birth, female (years)")
+Per_EV_b <- c(EV_b$X2005, EV_b$X2006, EV_b$X2007, EV_b$X2008, EV_b$X2009, EV_b$X2010, EV_b$X2011, EV_b$X2012, EV_b$X2013, EV_b$X2014)
+
+# Seleccionando las variables independientes
+
+##### Tasa de Mortalidad Infantil (TMI)
+##### Esta información se encuentra se encuentra con el título "Mortality rate, 
+##### infant (per 1,000 live births)"
+TMI_m <-  subset(mexico, mexico$Indicator.Name == "Mortality rate, infant (per 1,000 live births)")
+Per_TMI_m <- c(TMI_m$X2005, TMI_m$X2006, TMI_m$X2007, TMI_m$X2008, TMI_m$X2009, TMI_m$X2010, TMI_m$X2011, TMI_m$X2012, TMI_m$X2013, TMI_m$X2014)
+
+TMI_a <-  subset(argentina, argentina$Indicator.Name == "Mortality rate, infant (per 1,000 live births)")
+Per_TMI_a <- c(TMI_a$X2005, TMI_a$X2006, TMI_a$X2007, TMI_a$X2008, TMI_a$X2009, TMI_a$X2010, TMI_a$X2011, TMI_a$X2012, TMI_a$X2013, TMI_a$X2014)
+
+TMI_b <-  subset(brasil, brasil$Indicator.Name == "Mortality rate, infant (per 1,000 live births)")
+Per_TMI_b <- c(TMI_b$X2005, TMI_b$X2006, TMI_b$X2007, TMI_b$X2008, TMI_b$X2009, TMI_b$X2010, TMI_b$X2011, TMI_b$X2012, TMI_b$X2013, TMI_b$X2014)
+
+
+##### Tasa global de fecundida (TGF)
+##### Esta información se encuentra se encuentra con el título 
+##### "Adolescent fertility rate (births per 1,000 women ages 15-19)"
+##### o "Fertility rate, total (births per woman)" pero consideramos que era
+##### mejor utilizar la información de la primera opción.
+
+TGF_m <- subset(mexico,mexico$Indicator.Name=="Adolescent fertility rate (births per 1,000 women ages 15-19)")
+Per_TGF_m <- c(TGF_m$X2005, TGF_m$X2006, TGF_m$X2007, TGF_m$X2008, TGF_m$X2009, TGF_m$X2010, TGF_m$X2011, TGF_m$X2012, TGF_m$X2013, TGF_m$X2014)
+
+TGF_a <- subset(argentina,argentina$Indicator.Name=="Adolescent fertility rate (births per 1,000 women ages 15-19)")
+Per_TGF_a <- c(TGF_a$X2005, TGF_a$X2006, TGF_a$X2007, TGF_a$X2008, TGF_a$X2009, TGF_a$X2010, TGF_a$X2011, TGF_a$X2012, TGF_a$X2013, TGF_a$X2014)
+
+TGF_b <- subset(brasil,brasil$Indicator.Name=="Adolescent fertility rate (births per 1,000 women ages 15-19)")
+Per_TGF_b <- c(TGF_b$X2005, TGF_b$X2006, TGF_b$X2007, TGF_b$X2008, TGF_b$X2009, TGF_b$X2010, TGF_b$X2011, TGF_b$X2012, TGF_b$X2013, TGF_b$X2014)
+
+##### Porcentaje de hombres alfabetas (alfamas)
+##### Para esta variable habían 4 opciones, la que nos daba los datos de ambos
+##### géneros juntos, la que nos daba los datos de 15 a 24 años (que son los más 
+##### jóvenes) para hombres y para mujeres, los que nos indicaban la paridad de
+##### género para ambos géneros y los que arrojaban la información de adultos
+##### de 15 años en adelante para hombres y para mujeres.
+##### Escogimos la última opción, que para hombres se llama:
+##### "Literacy rate, adult male (% of males ages 15 and above)"
+
+alfamas_m <-  subset(mexico, mexico$Indicator.Name == "Literacy rate, adult male (% of males ages 15 and above)")
+Per_alfamas_m <- c(alfamas_m$X2005, alfamas_m$X2006, alfamas_m$X2007, alfamas_m$X2008, alfamas_m$X2009, alfamas_m$X2010, alfamas_m$X2011, alfamas_m$X2012, alfamas_m$X2013, alfamas_m$X2014)
+
+alfamas_a <-  subset(argentina, argentina$Indicator.Name == "Literacy rate, adult male (% of males ages 15 and above)")
+Per_alfamas_a <- c(alfamas_a$X2005, alfamas_a$X2006, alfamas_a$X2007, alfamas_a$X2008, alfamas_a$X2009, alfamas_a$X2010, alfamas_a$X2011, alfamas_a$X2012, alfamas_a$X2013, alfamas_a$X2014)
+
+alfamas_b <-  subset(brasil, brasil$Indicator.Name == "Literacy rate, adult male (% of males ages 15 and above)")
+Per_alfamas_b <- c(alfamas_b$X2005, alfamas_b$X2006, alfamas_b$X2007, alfamas_b$X2008, alfamas_b$X2009, alfamas_b$X2010, alfamas_b$X2011, alfamas_b$X2012, alfamas_b$X2013, alfamas_b$X2014)
+
+##### Porcentaje de mujeres alfabteas (alfafem)
+##### (De las opciones que escogimos en la variable indep. anterior)
+##### "Literacy rate, adult female (% of females ages 15 and above)"
+
+alfafem_m <-  subset(mexico, mexico$Indicator.Name == "Literacy rate, adult female (% of females ages 15 and above)")
+Per_alfafem_m <- c(alfafem_m$X2005, alfafem_m$X2006, alfafem_m$X2007, alfafem_m$X2008, alfafem_m$X2009, alfafem_m$X2010, alfafem_m$X2011, alfafem_m$X2012, alfafem_m$X2013, alfafem_m$X2014)
+
+alfafem_a <-  subset(argentina, argentina$Indicator.Name == "Literacy rate, adult female (% of females ages 15 and above)")
+Per_alfafem_a <- c(alfafem_a$X2005, alfafem_a$X2006, alfafem_a$X2007, alfafem_a$X2008, alfafem_a$X2009, alfafem_a$X2010, alfafem_a$X2011, alfafem_a$X2012, alfafem_a$X2013, alfafem_a$X2014)
+
+alfafem_b <-  subset(brasil, brasil$Indicator.Name == "Literacy rate, adult female (% of females ages 15 and above)")
+Per_alfafem_b <- c(alfafem_b$X2005, alfafem_b$X2006, alfafem_b$X2007, alfafem_b$X2008, alfafem_b$X2009, alfafem_b$X2010, alfafem_b$X2011, alfafem_b$X2012, alfafem_b$X2013, alfafem_b$X2014)
+
+##### Porcentaje de población urbana (p_urbana)
+##### % de Poblacion Urbana
+p_urbana_m <-  subset(mexico, mexico$Indicator.Name == "Urban population (% of total)")
+Per_p_urbana_m <- c(p_urbana_m$X2005, p_urbana_m$X2006, p_urbana_m$X2007, p_urbana_m$X2008, p_urbana_m$X2009, p_urbana_m$X2010, p_urbana_m$X2011, p_urbana_m$X2012, p_urbana_m$X2013, p_urbana_m$X2014)
+
+p_urbana_a <-  subset(argentina, argentina$Indicator.Name == "Urban population (% of total)")
+Per_p_urbana_a <- c(p_urbana_a$X2005, p_urbana_a$X2006, p_urbana_a$X2007, p_urbana_a$X2008, p_urbana_a$X2009, p_urbana_a$X2010, p_urbana_a$X2011, p_urbana_a$X2012, p_urbana_a$X2013, p_urbana_a$X2014)
+
+p_urbana_b <-  subset(brasil, brasil$Indicator.Name == "Urban population (% of total)")
+Per_p_urbana_b <- c(p_urbana_b$X2005, p_urbana_b$X2006, p_urbana_b$X2007, p_urbana_b$X2008, p_urbana_b$X2009, p_urbana_b$X2010, p_urbana_b$X2011, p_urbana_b$X2012, p_urbana_b$X2013, p_urbana_b$X2014)
+
+##### Tasa de Crecimiento de la población (% anual)
+##Tasa de crecimiento anual
+c_pob_m <-  subset(mexico, mexico$Indicator.Name == "Population growth (annual %)")
+Per_c_pob_m <- c(c_pob_m$X2005, c_pob_m$X2006, c_pob_m$X2007, c_pob_m$X2008, c_pob_m$X2009, c_pob_m$X2010, c_pob_m$X2011, c_pob_m$X2012, c_pob_m$X2013, c_pob_m$X2014)
+
+c_pob_a <-  subset(argentina, argentina$Indicator.Name == "Population growth (annual %)")
+Per_c_pob_a <- c(c_pob_a$X2005, c_pob_a$X2006, c_pob_a$X2007, c_pob_a$X2008, c_pob_a$X2009, c_pob_a$X2010, c_pob_a$X2011, c_pob_a$X2012, c_pob_a$X2013, c_pob_a$X2014)
+
+c_pob_b <-  subset(brasil, brasil$Indicator.Name == "Population growth (annual %)")
+Per_c_pob_b <- c(c_pob_b$X2005, c_pob_b$X2006, c_pob_b$X2007, c_pob_b$X2008, c_pob_b$X2009, c_pob_b$X2010, c_pob_b$X2011, c_pob_b$X2012, c_pob_b$X2013, c_pob_b$X2014)
+
+##### México
+
+##### Creando la base de datos
+
+datos_m<-data.frame(Per_EV_m,Per_TMI_m,Per_TGF_m,Per_alfamas_m,Per_alfafem_m,
+                    Per_p_urbana_m,Per_c_pob_m)
+View(datos_m)
+plot(datos_m)
+cor (datos_m, use ="everything", method="pearson")
+
+##### Como se puede ver en los resultados
+# Per_EV_m        1.0000000 
+# Per_TMI_m      -0.9983213 ->relación negativa muy alta 
+# Per_TGF_m      -0.9994997 ->relación negativa muy alta
+# Per_alfamas_m   0.8960442 ->relación positiva alta
+# Per_alfafem_m   0.9504558 ->relación positiva muy alta
+# Per_p_urbana_m  0.9981795 ->relación positiva muy alta
+# Per_c_pob_m    -0.4849652 ->relación negativa mediana
+
+modelo_m<-lm(Per_EV_m~Per_TMI_m+Per_TGF_m+Per_alfamas_m+Per_alfafem_m+
+               Per_p_urbana_m+Per_c_pob_m, data=datos_m)
+
+summary(modelo_m)
+
+##### La ecuación de y quedaría así:
+##### y= - 0.0491372 x1 - 0.0958180 x2 + 0.0101832 x3 - 0.0008682 x4 + 0.0804862 x5 - 0.1228809 x6
+##### Dónde 
+##### x1=Per_TMI_m 
+##### x2=Per_TGF_m
+##### x3=Per_alfamas_m 
+##### x4=Per_alfafem_m 
+##### x5=Per_p_urbana_m
+##### x6=Per_c_pob_m
+
+# Adjusted R-squared:      1 
+# F-statistic: 1.765e+05 -> 176500
+# p-value: 2.085e-08 ->0.00000002085
+
+anova (modelo_m)
+##### Como se puede ver los datos más significativos son TMI y TGF "***"
+##### El significativo c_pob "**"
+##### El medio significativo alfafem "*"
+##### El poco significativo alfamas " "
+##### Y al final p_urbana que presenta "."
+
+step(modelo_m, direction = "backward")
+
+##### Se puede ver que aquí se obtuvieron 2 modelos:
+##### 1) Per_EV_m ~ Per_TMI_m + Per_TGF_m + Per_alfamas_m + Per_alfafem_m + 
+#####    Per_p_urbana_m + Per_c_pob_m 
+##### AIC=-129.57
+
+##### 2) Per_EV_m ~ Per_TMI_m + Per_TGF_m + Per_alfamas_m + Per_p_urbana_m + 
+#####    Per_c_pob_m
+##### AIC=-130.89
+
+##### Por lo tanto el mejor modelo es el 2 (porque es el menor)
+
+modelo_m_2<-lm(Per_EV_m ~ Per_TMI_m + Per_TGF_m + Per_alfamas_m + Per_p_urbana_m + 
+                 Per_c_pob_m, data=datos_m)
+summary(modelo_m_2)
+
+##### La ecuación de y quedaría así:
+##### y= - 0.051627 x1 - 0.095352 x2 + 0.009131 x3 + 0.077600 x4 - 0.117832 x5
+##### Dónde 
+##### x1=Per_TMI_m 
+##### x2=Per_TGF_m
+##### x3=Per_alfamas_m  
+##### x4=Per_p_urbana_m
+##### x5=Per_c_pob_m
+
+# Adjusted R-squared:      1 
+# F-statistic: 2.638e+05 -> 26380
+# p-value: 4.025e-11 -> 0.00000000004025
+
+anova (modelo_m_2)
+##### Como se puede ver los datos más significativos son TMI y TGF "***"
+##### El significativo c_pob "**"
+##### El medio significativo p_urbana "*"
+##### Y al final alfamas que presenta "."
+
+datos_m$ajus<-fitted(modelo_m_2)
+datos_m$resi<-residuals(modelo_m_2)
+datos_m$rstud<-rstudent(modelo_m_2)
+
+##### Normalidad
+install.packages("lmtest")
+require(lmtest)
+ks.test(datos_m$rstud,"pnorm")
+##### p-value = 0.6953 ->mayor que 0.05
+
+##### Histograma
+hist(datos_m$rstud, xlab="Residuales", main="Histograma de Residuales")
+##### No se parece a una normal )):
+
+##### Homogeneidad de Varianzas
+bptest(modelo_m_2, studentize = FALSE, data= datos_m)
+##### p-value = 0.1828 > 0.05 entonces la varianza es constante a lo largo de 
+##### la muestra
+
+dwtest(modelo_m_2, alternative = "two.sided", data = datos_m)
+##### p-value = 0.8121 se acepta la hipótesis alternativa, la verdadera
+##### autocorrelación no es igual a 0
+
+
+
+
+##### Argentina
+
+##### Creando la base de datos
+
+datos_a<-data.frame(Per_EV_a,Per_TMI_a,Per_TGF_a,Per_alfamas_a,Per_alfafem_a,
+                    Per_p_urbana_a,Per_c_pob_a)
+View(datos_a)
+datos_a_1<-datos_a[,c(-4,-5)]
+View(datos_a_1)
+plot(datos_a_1)
+cor (datos_a_1, use ="everything", method="pearson")
+
+##### Como se puede ver en los resultados
+# Per_EV_a        1.0000000 
+# Per_TMI_a      -0.9965647 
+# Per_TGF_a       0.8171762 
+# Per_p_urbana_a  0.9999871 
+# Per_c_pob_a    -0.3019627  
+
+modelo_a<-lm(Per_EV_a~Per_TMI_a+Per_TGF_a+Per_p_urbana_a+Per_c_pob_a, 
+             data=datos_a_1)
+
+summary(modelo_a)
+
+##### La ecuación de y quedaría así:
+##### y= - 0.019668 x1 - 0.001380 x2 + 0.927686 x3 + 0.175692 x4
+##### Dónde 
+##### x1=Per_TMI_a 
+##### x2=Per_TGF_a 
+##### x3=Per_p_urbana_a 
+##### x4=Per_c_pob_a 
+
+
+# Adjusted R-squared:      1 
+# F-statistic: 7.072e+04 -> 7072
+# p-value: 4.597e-12 ->0.000000000004597
+
+anova (modelo_a)
+##### Como se puede ver los datos más significativos son TMI, TGF y p_urbana "***"
+##### El significativo c_pob " "
+
+step(modelo_a, direction = "backward")
+
+##### Se puede ver que aquí se obtuvieron 2 modelos:
+##### 1) Per_EV_a ~ Per_TMI_a + Per_TGF_a + Per_p_urbana_a + Per_c_pob_a 
+##### AIC=-114.46
+
+##### 2) Per_EV_a ~ Per_TMI_a + Per_p_urbana_a + Per_c_pob_a
+##### AIC=-116.34
+
+##### Por lo tanto el mejor modelo es el 2 (porque es el menor)
+
+modelo_a_2<-lm(Per_EV_a ~ Per_TMI_a + Per_p_urbana_a + Per_c_pob_a, data=datos_a_1)
+summary(modelo_a_2)
+
+##### La ecuación de y quedaría así:
+##### y= -0.02476 x1 + 0.91279 x2 + 0.14052 x3
+##### Dónde 
+##### x1=Per_TMI_a 
+##### x2=Per_p_urbana_a
+##### x3=Per_c_pob_a
+
+# Adjusted R-squared:      1 
+# F-statistic: 1.119e+05 -> 111900
+# p-value: 1.25e-14 -> 0.000000000000125
+
+anova (modelo_a_2)
+##### Como se puede ver los datos más significativos son TMI y p_urbana "***"
+##### El significativo c_pob " "
+
+datos_a_1$ajus<-fitted(modelo_a_2)
+datos_a_1$resi<-residuals(modelo_a_2)
+datos_a_1$rstud<-rstudent(modelo_a_2)
+
+##### Normalidad
+#install.packages("lmtest")
+#require(lmtest)
+ks.test(datos_a_1$rstud,"pnorm")
+##### p-value = 0.8275 ->mayor que 0.05
+
+##### Histograma
+hist(datos_a_1$rstud, xlab="Residuales", main="Histograma de Residuales")
+##### No se parece a una normal )):
+
+##### Homogeneidad de Varianzas
+bptest(modelo_a_2, studentize = FALSE, data= datos_a_1)
+##### p-value = 0.2963 > 0.05 entonces la varianza es constante a lo largo de 
+##### la muestra
+
+dwtest(modelo_a_2, alternative = "two.sided", data = datos_a_1)
+##### p-value = 0.002159 se acepta la hipótesis alternativa, la verdadera
+##### autocorrelación no es igual a 0
+
+
+##### Brasil
+
+##### Creando la base de datos
+modelo_b<-lm(Per_EV_b~Per_TMI_b+Per_TGF_b+Per_alfamas_b+Per_alfafem_b+
+               Per_p_urbana_b+Per_c_pob_b, data=datos_b_1)
+
+View(datos_b)
+datos_b_1<-datos_b[c(-1,-10),]
+View(datos_b_1)
+plot(datos_b_1)
+cor (datos_b_1, use ="everything", method="pearson")
+
+##### Como se puede ver en los resultados
+# Per_EV_b        1.0000000 
+# Per_TMI_b      -0.9473478  
+# Per_TGF_b      -0.9617209  
+# Per_alfamas_b   0.9438228 
+# Per_alfafem_b   0.9564027 
+# Per_p_urbana_b  0.9998671 
+# Per_c_pob_b    -0.9434923  
+
+summary(modelo_b)
+
+##### La ecuación de y quedaría así:
+##### y=  1.425e-02 x1 - 4.469e-03 x2 + 4.456e-05 x3- 3.334e-03 x4 + 1.008e+00 x5 +2.476e-01 x6
+##### Dónde 
+##### x1=Per_TMI_b
+##### x2=Per_TGF_b 
+##### x3=Per_alfamas_b
+##### x4=Per_alfafem_b
+##### x5=Per_p_urbana_b 
+##### x6=Per_c_pob_b 
+
+
+# Adjusted R-squared:      1 
+# F-statistic:  1.279e+06 -> 1279000
+# p-value: 0.0006769
+
+anova (modelo_b)
+##### Como se puede ver el dato más significativo es TMI "***"
+##### Los datos significativos TGF, alfamas, alfafem y p_urbana "**"
+##### El significativo c_pob " "
+
+step(modelo_b, direction = "backward")
+
+##### Se puede ver que aquí se obtuvieron 2 modelos:
+##### 1) Per_EV_b ~ Per_TMI_b + Per_TGF_b + Per_alfamas_b + Per_alfafem_b + 
+#####    Per_p_urbana_b + Per_c_pob_b 
+##### AIC=-120.05
+
+##### 2) Per_EV_b ~ Per_TMI_b + Per_TGF_b + Per_alfafem_b + Per_p_urbana_b + 
+#####    Per_c_pob_b
+##### AIC=-122.05
+
+##### Por lo tanto el mejor modelo es el 2 (porque es el menor)
+
+modelo_b_2<-lm(Per_EV_b ~ Per_TMI_b + Per_TGF_b + Per_alfafem_b + Per_p_urbana_b + 
+              Per_c_pob_b, data=datos_b_1)
+summary(modelo_b_2)
+
+##### La ecuación de y quedaría así:
+##### y=  0.014270 x1 -0.004452 x2 -0.003267 x3+1.007489 x4 + 0.246906 
+##### Dónde 
+##### x1=Per_TMI_b 
+##### x2=Per_TGF_b
+##### x3=Per_alfafem_b
+##### x4=Per_p_urbana_b
+##### x5=Per_c_pob_b
+
+# Adjusted R-squared:      1 
+# F-statistic: 3.069e+06 
+# p-value: 3.258e-07 -> 0.0000003258
+
+anova (modelo_b_2)
+##### Como se puede ver los datos más significativos son TMI, TGF, alfafem y p_urbana "***"
+##### y c_pob es significativo  "*"
+
+datos_b_1$ajus<-fitted(modelo_b_2)
+datos_b_1$resi<-residuals(modelo_b_2)
+datos_b_1$rstud<-rstudent(modelo_b_2)
+
+##### Normalidad
+#install.packages("lmtest")
+#require(lmtest)
+ks.test(datos_b_1$rstud,"pnorm")
+##### p-value = 0.1616 ->mayor que 0.05
+
+##### Histograma
+hist(datos_b_1$rstud, xlab="Residuales", main="Histograma de Residuales")
+##### No se parece a una normal )):
+
+##### Homogeneidad de Varianzas
+bptest(modelo_b_2, studentize = FALSE, data= datos_b_1)
+##### p-value = 0.3983 > 0.05 entonces la varianza es constante a lo largo de 
+##### la muestra
+
+dwtest(modelo_b_2, alternative = "two.sided", data = datos_b_1)
+##### p-value = 0.003126 se acepta la hipótesis alternativa, la verdadera
+##### autocorrelación no es igual a 0
